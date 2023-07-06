@@ -5,7 +5,7 @@ import VertexShaderSource from './shader/VertexShaderSource';
 
 
 export default function App() {
-
+  const resulution = {x:4,y:3}
   const draw = (ctx, frameCount) => {
 
 
@@ -13,19 +13,19 @@ export default function App() {
   }
 
   const initShader = (ctx) => {
-
+    
 
     const buffer = ctx.createBuffer();
     ctx.bindBuffer(ctx.ARRAY_BUFFER, buffer);
     ctx.bufferData(
       ctx.ARRAY_BUFFER, 
       new Float32Array([
-        -1.0, -1.0, 
-         1.0, -1.0, 
-        -1.0,  1.0, 
-        -1.0,  1.0, 
-         1.0, -1.0, 
-         1.0,  1.0]), 
+        0, 0, 
+        resulution.x, 0, 
+        0, resulution.y, 
+        0, resulution.y, 
+        resulution.x, 0, 
+        resulution.x, resulution.y]), 
          ctx.STATIC_DRAW
     );
 
@@ -38,6 +38,7 @@ export default function App() {
     ctx.shaderSource(fragmentShader, FragShaderSource)
     ctx.compileShader(fragmentShader)
 
+    ctx.viewport(0, 0, ctx.canvas.width, ctx.canvas.height);
     const program = ctx.createProgram();
     ctx.attachShader(program, vertexShader);
     ctx.attachShader(program, fragmentShader);
@@ -46,10 +47,21 @@ export default function App() {
 
     
     const positionLocation = ctx.getAttribLocation(program, "a_position");
+    var resolutionUniformLocation = ctx.getUniformLocation(program, "u_resolution");
     ctx.enableVertexAttribArray(positionLocation);
-    ctx.vertexAttribPointer(positionLocation, 2, ctx.FLOAT, false, 0, 0);
-
-    console.log("Finished Initialization of Canvas")
+     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+  var size = 2;          // 2 components per iteration
+  var type = ctx.FLOAT;   // the data is 32bit floats
+  var normalize = false; // don't normalize the data
+  var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+  var offset = 0;        // start at the beginning of the buffer
+  ctx.vertexAttribPointer(
+      positionLocation, size, type, normalize, stride, offset);
+    ctx.uniform2f(resolutionUniformLocation, 4, 3);
+    
+    
+    
+      console.log("Finished Initialization of Canvas")
 
   }
   return (
