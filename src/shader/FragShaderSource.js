@@ -6,6 +6,6 @@ void main() {
   }
   
   `
-  
+  //TODO add x640 : y480 vars as uniforms into this frag shader
   export default FragShaderSource
 

@@ -10,7 +10,7 @@ const Canvas = props => {
       useEffect(() => {
         
         const canvas = canvasRef.current
-        const context = canvas.getContext('experimental-webgl')
+        const context = canvas.getContext('webgl')
         let frameCount = 0
         let animationFrameId
 

@@ -5,7 +5,7 @@ import VertexShaderSource from './shader/VertexShaderSource';
 
 
 export default function App() {
-  const resulution = {x:4,y:3}
+  const resulution = {x:640,y:480}
   const draw = (ctx, frameCount) => {
 
 
@@ -57,7 +57,7 @@ export default function App() {
   var offset = 0;        // start at the beginning of the buffer
   ctx.vertexAttribPointer(
       positionLocation, size, type, normalize, stride, offset);
-    ctx.uniform2f(resolutionUniformLocation, 4, 3);
+    ctx.uniform2f(resolutionUniformLocation, resulution.x, resulution.y);
     
     
     
@@ -66,7 +66,7 @@ export default function App() {
   }
   return (
     <div className="App">
-      <Canvas width={640} height={480} draw={draw} initShader={initShader}></Canvas>
+      <Canvas class="canvas" width={resulution.x} height={resulution.y} draw={draw} initShader={initShader}></Canvas>
     </div>
   );
 }
