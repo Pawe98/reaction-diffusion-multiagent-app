@@ -1,4 +1,3 @@
-import React from 'react'
 const VertexShaderSource = `
     attribute vec2 a_position;
     
@@ -16,6 +15,6 @@ const VertexShaderSource = `
    
       gl_Position = vec4(clipSpace, 0, 1);
     }
-    `
-  
-  export default VertexShaderSource
+    `;
+
+export default VertexShaderSource;
