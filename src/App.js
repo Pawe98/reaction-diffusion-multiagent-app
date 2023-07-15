@@ -68,6 +68,46 @@ export default function App() {
     );
     gl.uniform2f(resolutionUniformLocation, resulution.x, resulution.y);
 
+    // Define several convolution kernels
+    var kernels = {
+      normal: [0, 0, 0, 0, 1, 0, 0, 0, 0],
+      gaussianBlur: [
+        0.045, 0.122, 0.045, 0.122, 0.332, 0.122, 0.045, 0.122, 0.045,
+      ],
+      gaussianBlur2: [1, 2, 1, 2, 4, 2, 1, 2, 1],
+      gaussianBlur3: [0, 1, 0, 1, 1, 1, 0, 1, 0],
+      unsharpen: [-1, -1, -1, -1, 9, -1, -1, -1, -1],
+      sharpness: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+      sharpen: [-1, -1, -1, -1, 16, -1, -1, -1, -1],
+      edgeDetect: [
+        -0.125, -0.125, -0.125, -0.125, 1, -0.125, -0.125, -0.125, -0.125,
+      ],
+      edgeDetect2: [-1, -1, -1, -1, 8, -1, -1, -1, -1],
+      edgeDetect3: [-5, 0, 0, 0, 0, 0, 0, 0, 5],
+      edgeDetect4: [-1, -1, -1, 0, 0, 0, 1, 1, 1],
+      edgeDetect5: [-1, -1, -1, 2, 2, 2, -1, -1, -1],
+      edgeDetect6: [-5, -5, -5, -5, 39, -5, -5, -5, -5],
+      sobelHorizontal: [1, 2, 1, 0, 0, 0, -1, -2, -1],
+      sobelVertical: [1, 0, -1, 2, 0, -2, 1, 0, -1],
+      previtHorizontal: [1, 1, 1, 0, 0, 0, -1, -1, -1],
+      previtVertical: [1, 0, -1, 1, 0, -1, 1, 0, -1],
+      boxBlur: [0.111, 0.111, 0.111, 0.111, 0.111, 0.111, 0.111, 0.111, 0.111],
+      triangleBlur: [
+        0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625,
+      ],
+      emboss: [-2, -1, 0, -1, 1, 1, 0, 1, 2],
+      diffusion:  [0.05, 0.2, 0.05, 0.2, -1.0, 0.2, 0.05, 0.2 , 0.05],
+      test:       [0.250, 0.5, 0.250, 0.5, -1.0, 0.5, 0.250, 0.5 , 0.250]
+    };
+    var initialSelection = "diffusion";
+    
+    //Bind the post processing kernels
+    var kernelLocation = gl.getUniformLocation(program, "u_kernel[0]");
+     // set the kernel and it's weight
+     gl.uniform1fv(kernelLocation, kernels[initialSelection]);
+     var kernelWeightLocation = gl.getUniformLocation(program, "u_kernelWeight");
+     gl.uniform1f(kernelWeightLocation, computeKernelWeight(kernels[initialSelection]));
+
     // Bind the previous texture uniform location
     const prevTextureLocation = gl.getUniformLocation(program, "uPrevTexture");
     gl.uniform1i(prevTextureLocation, 0); // Set the texture unit to 0
@@ -86,6 +126,13 @@ export default function App() {
     console.log(gl.getExtension("WEBGL_draw_buffers"));
     console.log("Finished Initialization of Canvas");
   };
+
+  function computeKernelWeight(kernel) {
+    var weight = kernel.reduce(function(prev, curr) {
+        return prev + curr;
+    });
+    return weight <= 0 ? 1 : weight;
+  }
   return (
     <div className="App">
       <Canvas

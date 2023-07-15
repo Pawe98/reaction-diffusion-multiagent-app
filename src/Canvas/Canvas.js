@@ -98,7 +98,7 @@ const Canvas = (props) => {
 
         // Render to the canvas using the current texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, null); //this will make it render to canvas
-        gl.bindTexture(gl.TEXTURE_2D, currentTexture);
+        gl.bindTexture(gl.TEXTURE_2D, prevTexture);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
         gl.clearColor(1, 1, 1, 1); // clear to white
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
