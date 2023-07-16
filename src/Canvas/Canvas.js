@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import WebGLDebugUtils from "../webgl-debug";
+import "./Canvas.css";
 const Canvas = (props) => {
   const { draw, initShader, ...rest } = props;
 
@@ -13,8 +14,8 @@ const Canvas = (props) => {
       let animationFrameId;
 
       // create two textures for ping-pong rendering
-      const textureWidth = 640;
-      const textureHeight = 480;
+      const textureWidth = 100;
+      const textureHeight = 100;
       const textures = [];
       for (let i = 0; i < 2; i++) {
         const texture = gl.createTexture();
@@ -65,6 +66,10 @@ const Canvas = (props) => {
         );
 
         const isFirstFrame = frameCount <= 100;
+
+        if(!isFirstFrame) {
+          //alert("Next Frame");
+        }
 
         // Set the value of the isFirstFrame uniform
         console.log(

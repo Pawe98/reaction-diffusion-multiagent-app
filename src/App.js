@@ -4,7 +4,7 @@ import FragShaderSource from "./shader/FragShaderSource";
 import VertexShaderSource from "./shader/VertexShaderSource";
 
 export default function App() {
-  const resulution = { x: 640, y: 480 };
+  const resulution = { x: 100, y: 100 };
   const draw = (ctx, frameCount) => {
     ctx.drawArrays(ctx.TRIANGLES, 0, 6);
   };
@@ -136,7 +136,7 @@ export default function App() {
   return (
     <div className="App">
       <Canvas
-        class="canvas"
+        class="GLCanvas"
         width={resulution.x}
         height={resulution.y}
         draw={draw}
