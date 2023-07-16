@@ -14,8 +14,8 @@ const Canvas = (props) => {
       let animationFrameId;
 
       // create two textures for ping-pong rendering
-      const textureWidth = 100;
-      const textureHeight = 100;
+      const textureWidth = 200;
+      const textureHeight = 200;
       const textures = [];
       for (let i = 0; i < 2; i++) {
         const texture = gl.createTexture();
@@ -40,10 +40,7 @@ const Canvas = (props) => {
       // Create and bind the framebuffer
       const fb = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-
       // Attach the textures to the framebuffer
-      const attachmentPoints = [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1];
-      console.log("attachments:" + gl.COLOR_ATTACHMENT1);
       for (let i = 0; i < 2; i++) {
         gl.framebufferTexture2D(
           gl.FRAMEBUFFER,
@@ -88,7 +85,7 @@ const Canvas = (props) => {
         gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
         gl.framebufferTexture2D(
           gl.FRAMEBUFFER,
-          attachmentPoints[0],
+          gl.COLOR_ATTACHMENT0,
           gl.TEXTURE_2D,
           currentTexture,
           0

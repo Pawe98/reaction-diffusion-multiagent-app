@@ -4,7 +4,7 @@ import FragShaderSource from "./shader/FragShaderSource";
 import VertexShaderSource from "./shader/VertexShaderSource";
 
 export default function App() {
-  const resulution = { x: 100, y: 100 };
+  const resulution = { x: 200, y: 200 };
   const draw = (ctx, frameCount) => {
     ctx.drawArrays(ctx.TRIANGLES, 0, 6);
   };
@@ -117,31 +117,6 @@ export default function App() {
     // Define several convolution kernels
     var kernels = {
       normal: [0, 0, 0, 0, 1, 0, 0, 0, 0],
-      gaussianBlur: [
-        0.045, 0.122, 0.045, 0.122, 0.332, 0.122, 0.045, 0.122, 0.045,
-      ],
-      gaussianBlur2: [1, 2, 1, 2, 4, 2, 1, 2, 1],
-      gaussianBlur3: [0, 1, 0, 1, 1, 1, 0, 1, 0],
-      unsharpen: [-1, -1, -1, -1, 9, -1, -1, -1, -1],
-      sharpness: [0, -1, 0, -1, 5, -1, 0, -1, 0],
-      sharpen: [-1, -1, -1, -1, 16, -1, -1, -1, -1],
-      edgeDetect: [
-        -0.125, -0.125, -0.125, -0.125, 1, -0.125, -0.125, -0.125, -0.125,
-      ],
-      edgeDetect2: [-1, -1, -1, -1, 8, -1, -1, -1, -1],
-      edgeDetect3: [-5, 0, 0, 0, 0, 0, 0, 0, 5],
-      edgeDetect4: [-1, -1, -1, 0, 0, 0, 1, 1, 1],
-      edgeDetect5: [-1, -1, -1, 2, 2, 2, -1, -1, -1],
-      edgeDetect6: [-5, -5, -5, -5, 39, -5, -5, -5, -5],
-      sobelHorizontal: [1, 2, 1, 0, 0, 0, -1, -2, -1],
-      sobelVertical: [1, 0, -1, 2, 0, -2, 1, 0, -1],
-      previtHorizontal: [1, 1, 1, 0, 0, 0, -1, -1, -1],
-      previtVertical: [1, 0, -1, 1, 0, -1, 1, 0, -1],
-      boxBlur: [0.111, 0.111, 0.111, 0.111, 0.111, 0.111, 0.111, 0.111, 0.111],
-      triangleBlur: [
-        0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625,
-      ],
-      emboss: [-2, -1, 0, -1, 1, 1, 0, 1, 2],
       diffusion:  [0.05, 0.2, 0.05, 0.2, -1.0, 0.2, 0.05, 0.2 , 0.05],
       test:       [0.250, 0.5, 0.250, 0.5, -1.0, 0.5, 0.250, 0.5 , 0.250]
     };

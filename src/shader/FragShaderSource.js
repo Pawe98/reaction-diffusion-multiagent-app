@@ -13,8 +13,8 @@ varying vec2 v_texCoord;
 float laplace(in vec2 coordinate, in int channel) {
 
 
-  float resolutionX = 100.0;
-  float resolutionY = 100.0;
+  float resolutionX = 200.0;
+  float resolutionY = 200.0;
   vec2 texelSize = 1.0 / vec2(resolutionX, resolutionY);
 
 
@@ -29,15 +29,15 @@ float laplace(in vec2 coordinate, in int channel) {
   vec2 textureAsPixelCoord8 = vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY); 
 
 
-  vec4 colorSum = texture2D(uPrevTexture, textureAsPixelCoord0) * vec4(u_kernel[0], u_kernel[0], u_kernel[0], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord1) * vec4(u_kernel[1], u_kernel[1], u_kernel[1], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord2) * vec4(u_kernel[2], u_kernel[2], u_kernel[2], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord3) * vec4(u_kernel[3], u_kernel[3], u_kernel[3], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord4) * vec4(u_kernel[4], u_kernel[4], u_kernel[4], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord5) * vec4(u_kernel[5], u_kernel[5], u_kernel[5], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord6) * vec4(u_kernel[6], u_kernel[6], u_kernel[6], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord7) * vec4(u_kernel[7], u_kernel[7], u_kernel[7], 1.0) +
-  texture2D(uPrevTexture, textureAsPixelCoord8) * vec4(u_kernel[8], u_kernel[8], u_kernel[8], 1.0);
+  vec4 colorSum = texture2D(uPrevTexture, textureAsPixelCoord0, 0.0) * vec4(u_kernel[0], u_kernel[0], u_kernel[0], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord1, 0.0) * vec4(u_kernel[1], u_kernel[1], u_kernel[1], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord2, 0.0) * vec4(u_kernel[2], u_kernel[2], u_kernel[2], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord3, 0.0) * vec4(u_kernel[3], u_kernel[3], u_kernel[3], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord4, 0.0) * vec4(u_kernel[4], u_kernel[4], u_kernel[4], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord5, 0.0) * vec4(u_kernel[5], u_kernel[5], u_kernel[5], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord6, 0.0) * vec4(u_kernel[6], u_kernel[6], u_kernel[6], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord7, 0.0) * vec4(u_kernel[7], u_kernel[7], u_kernel[7], 1.0) +
+  texture2D(uPrevTexture, textureAsPixelCoord8, 0.0) * vec4(u_kernel[8], u_kernel[8], u_kernel[8], 1.0);
 
   if(channel == 0) {
     return (colorSum).r;
@@ -53,19 +53,19 @@ float laplace(in vec2 coordinate, in int channel) {
 void main() {
 
   float dA = 1.0; //Diffusion Rate A
-  float dB = 0.22; //Diffusion Rate B
+  float dB = 0.24; //Diffusion Rate B
   float feed = 0.055; //Feed Rate at which A is feed into
   float kill = 0.062; //Kill Rate at wich B is Removed
 
-  float resolutionX = 100.0;
-  float resolutionY = 100.0;
+  float resolutionX = 200.0;
+  float resolutionY = 200.0;
   
   
   if (isFirstFrame) {
 
     
 
-    if(gl_FragCoord.x + 0.5 >= 50.0 && gl_FragCoord.x + 0.5 <= 55.0 && gl_FragCoord.y + 0.5 >= 50.0 && gl_FragCoord.y + 0.5 <= 55.0) {
+    if(gl_FragCoord.x + 0.5 >= 70.0 && gl_FragCoord.x + 0.5 <= 130.0 && gl_FragCoord.y + 0.5 >= 70.0 && gl_FragCoord.y + 0.5 <= 130.0) {
       gl_FragColor = vec4(0, 1.0, 0.0, 1.0);
       
     } else {
@@ -82,9 +82,9 @@ void main() {
       vec2 pixelCoord = floor(textureCoord * vec2(resolutionX, resolutionY));
 
       // Sample in the middle of the pixel
-      vec2 textureAsPixelCoord = vec2((pixelCoord.x + 0.5), (pixelCoord.y + 0.5)) / vec2(resolutionX, resolutionY);
+      vec2 textureAsPixelCoord = fract(vec2((pixelCoord.x + 0.5), (pixelCoord.y + 0.5)) / vec2(resolutionX, resolutionY));
     
-      vec4 prevTextureColor = texture2D(uPrevTexture, textureAsPixelCoord);
+      vec4 prevTextureColor = texture2D(uPrevTexture, textureAsPixelCoord, 0.0);
       
       gl_FragColor = prevTextureColor;
 
