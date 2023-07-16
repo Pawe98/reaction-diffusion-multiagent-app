@@ -6,6 +6,9 @@ uniform bool isFirstFrame;
 uniform highp float u_kernel[9];
 uniform float u_kernelWeight;
 
+// Passed in from the vertex shader.
+varying vec2 v_texCoord;
+
 
 float laplace(in vec2 coordinate, in int channel) {
 
@@ -73,7 +76,7 @@ void main() {
     } else {
 
       // Sample the prevTexture color
-      vec2 textureCoord = vec2((gl_FragCoord.x), (gl_FragCoord.y)) / vec2(resolutionX, resolutionY);
+      vec2 textureCoord = v_texCoord;
 
       // Round down the coordinate to the nearest pixel
       vec2 pixelCoord = floor(textureCoord * vec2(resolutionX, resolutionY));
@@ -83,18 +86,18 @@ void main() {
     
       vec4 prevTextureColor = texture2D(uPrevTexture, textureAsPixelCoord);
       
-      //gl_FragColor = prevTextureColor;
+      gl_FragColor = prevTextureColor;
 
         gl_FragColor = vec4(prevTextureColor.r + 
-         (dA * laplace(pixelCoord, 0)) - 
+         ((dA * laplace(pixelCoord, 0)) - 
          (prevTextureColor.r *  prevTextureColor.g * prevTextureColor.g) +
-         (feed * (1.0 - prevTextureColor.r)), 
+         (feed * (1.0 - prevTextureColor.r))) * 1.0, 
 
-
+ 
          prevTextureColor.g + 
-         (dB * laplace(pixelCoord, 1)) +
+         ((dB * laplace(pixelCoord, 1)) +
          (prevTextureColor.r * prevTextureColor.g * prevTextureColor.g) -
-         ((kill + feed) * prevTextureColor.g) , 0, 1);
+         ((kill + feed) * prevTextureColor.g)) * 1.0 , 0, 1);
      
     }
     

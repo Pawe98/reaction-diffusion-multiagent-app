@@ -1,6 +1,9 @@
 const VertexShaderSource = `
     attribute vec2 a_position;
+    attribute vec2 a_texCoord;
     
+    varying vec2 v_texCoord;
+
     uniform vec2 u_resolution;
  
     void main() {
@@ -12,8 +15,8 @@ const VertexShaderSource = `
    
       // convert from 0->2 to -1->+1 (clip space)
       vec2 clipSpace = zeroToTwo - 1.0;
-   
-      gl_Position = vec4(clipSpace * vec2(-1, 1), 0, 1);
+      v_texCoord = a_texCoord;
+      gl_Position = vec4(clipSpace * vec2(1, 1), 0, 1);
     }
     `;
 

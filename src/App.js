@@ -68,6 +68,52 @@ export default function App() {
     );
     gl.uniform2f(resolutionUniformLocation, resulution.x, resulution.y);
 
+
+    var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
+
+    // provide texture coordinates for the rectangle.
+    var texCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        0,
+        0,
+        1,
+        0,
+        0,
+       1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+      ]),
+      gl.STATIC_DRAW
+    );
+
+    // Turn on the attribute
+    gl.enableVertexAttribArray(texCoordAttributeLocation);
+    // Tell the attribute how to get data out of texCoordBuffer (ARRAY_BUFFER)
+    var size = 2; // 2 components per iteration
+    var type = gl.FLOAT; // the data is 32bit floats
+    var normalize = false; // don't normalize the data
+    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+    var offset = 0; // start at the beginning of the buffer
+    gl.vertexAttribPointer(
+      texCoordAttributeLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
+
+
+
+
+
     // Define several convolution kernels
     var kernels = {
       normal: [0, 0, 0, 0, 1, 0, 0, 0, 0],
