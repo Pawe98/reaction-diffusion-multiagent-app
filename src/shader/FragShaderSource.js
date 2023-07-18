@@ -18,15 +18,15 @@ float laplace(in vec2 coordinate, in int channel) {
   vec2 texelSize = 1.0 / vec2(resolutionX, resolutionY);
 
 
-  vec2 textureAsPixelCoord0 = vec2((coordinate.x + 0.5) - 1.0, (coordinate.y + 0.5) - 1.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord1 = vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) - 1.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord2 = vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) - 1.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord3 = vec2((coordinate.x + 0.5) - 1.0, (coordinate.y + 0.5) + 0.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord4 = vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) + 0.0) / vec2(resolutionX, resolutionY); //center pixel
-  vec2 textureAsPixelCoord5 = vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) + 0.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord6 = vec2((coordinate.x + 0.5) - 1.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord7 = vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY); 
-  vec2 textureAsPixelCoord8 = vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY); 
+  vec2 textureAsPixelCoord0 = fract(vec2((coordinate.x + 0.5) - 1.0, (coordinate.y + 0.5) - 1.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord1 = fract(vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) - 1.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord2 = fract(vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) - 1.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord3 = fract(vec2((coordinate.x + 0.5) - 1.0, (coordinate.y + 0.5) + 0.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord4 = fract(vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) + 0.0) / vec2(resolutionX, resolutionY)); //center pixel
+  vec2 textureAsPixelCoord5 = fract(vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) + 0.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord6 = fract(vec2((coordinate.x + 0.5) - 1.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord7 = fract(vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY)); 
+  vec2 textureAsPixelCoord8 = fract(vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY)); 
 
 
   vec4 colorSum = texture2D(uPrevTexture, textureAsPixelCoord0, 0.0) * vec4(u_kernel[0], u_kernel[0], u_kernel[0], 1.0) +
@@ -50,6 +50,10 @@ float laplace(in vec2 coordinate, in int channel) {
 
 }
 
+float rand(vec2 co){
+  return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void main() {
 
   float dA = 1.0; //Diffusion Rate A
@@ -63,15 +67,22 @@ void main() {
   
   if (isFirstFrame) {
 
+    if(rand(v_texCoord) > 0.5) {
+      gl_FragColor = vec4(0.0,rand(v_texCoord),0.0,1.0);
+    } else {
+      gl_FragColor = vec4(rand(v_texCoord),0.0,0.0,1.0);
+    }
+        
+
+    // if(gl_FragCoord.x + 0.5 >= 70.0 && gl_FragCoord.x + 0.5 <= 130.0 && gl_FragCoord.y + 0.5 >= 70.0 && gl_FragCoord.y + 0.5 <= 130.0) {
+    //   gl_FragColor = vec4(0, 1.0, 0.0, 1.0);
+      
+    // } else {
+    //   gl_FragColor = vec4(1.0,0.0,0.0,1);
+    // }
     
 
-    if(gl_FragCoord.x + 0.5 >= 70.0 && gl_FragCoord.x + 0.5 <= 130.0 && gl_FragCoord.y + 0.5 >= 70.0 && gl_FragCoord.y + 0.5 <= 130.0) {
-      gl_FragColor = vec4(0, 1.0, 0.0, 1.0);
-      
-    } else {
-      
-      gl_FragColor = vec4(1.0, 0, 0.0, 1.0);
-    }
+    
       
     } else {
 
@@ -79,26 +90,27 @@ void main() {
       vec2 textureCoord = v_texCoord;
 
       // Round down the coordinate to the nearest pixel
-      vec2 pixelCoord = floor(textureCoord * vec2(resolutionX, resolutionY));
+      vec2 pixelCoord = floor(textureCoord * vec2(resolutionX, resolutionY)); // from 0.0
 
       // Sample in the middle of the pixel
       vec2 textureAsPixelCoord = fract(vec2((pixelCoord.x + 0.5), (pixelCoord.y + 0.5)) / vec2(resolutionX, resolutionY));
     
       vec4 prevTextureColor = texture2D(uPrevTexture, textureAsPixelCoord, 0.0);
       
-      gl_FragColor = prevTextureColor;
+         if(mod(pixelCoord.x, 1.0) == 0.0) {
+          gl_FragColor = prevTextureColor;
 
-        gl_FragColor = vec4(prevTextureColor.r + 
-         ((dA * laplace(pixelCoord, 0)) - 
-         (prevTextureColor.r *  prevTextureColor.g * prevTextureColor.g) +
-         (feed * (1.0 - prevTextureColor.r))) * 1.0, 
-
- 
-         prevTextureColor.g + 
-         ((dB * laplace(pixelCoord, 1)) +
-         (prevTextureColor.r * prevTextureColor.g * prevTextureColor.g) -
-         ((kill + feed) * prevTextureColor.g)) * 1.0 , 0, 1);
+            gl_FragColor = vec4(prevTextureColor.r + 
+             ((dA * laplace(pixelCoord, 0)) - 
+             (prevTextureColor.r *  prevTextureColor.g * prevTextureColor.g) +
+             (feed * (1.0 - prevTextureColor.r))) * 1.0, 
+    
      
+             prevTextureColor.g + 
+             ((dB * laplace(pixelCoord, 1)) +
+             (prevTextureColor.r * prevTextureColor.g * prevTextureColor.g) -
+             ((kill + feed) * prevTextureColor.g)) * 1.0 , 0, 1);
+        }
     }
     
 
