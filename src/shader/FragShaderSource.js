@@ -67,7 +67,7 @@ void main() {
   
   if (isFirstFrame) {
 
-    if(rand(v_texCoord) > 0.5) {
+    if(rand(v_texCoord + vec2(2.123, 3.321)) > 0.5) {
       gl_FragColor = vec4(0.0,rand(v_texCoord),0.0,1.0);
     } else {
       gl_FragColor = vec4(rand(v_texCoord),0.0,0.0,1.0);
