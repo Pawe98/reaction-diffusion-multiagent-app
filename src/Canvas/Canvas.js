@@ -1,8 +1,20 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import WebGLDebugUtils from "../webgl-debug";
 import "./Canvas.css";
+
+
 const Canvas = (props) => {
   const { draw, initShader, ...rest } = props;
+
+  const [animationIsRunning, setAnimationIsRunning] = useState(false);
+
+  // ...
+
+  // Step 4: Create a toggleAnimation function
+  const toggleAnimation = () => {
+    console.log("Button clicked!: " + !animationIsRunning); // Add this line
+    setAnimationIsRunning(!animationIsRunning);
+  };
 
   const useCanvas = (draw) => {
     const canvasRef = useRef(null);
@@ -62,17 +74,13 @@ const Canvas = (props) => {
           "isFirstFrame"
         );
 
-        const isFirstFrame = frameCount <= 100;
-
-        if(!isFirstFrame) {
-          //alert("Next Frame");
-        }
+        const isFirstFrame = frameCount < 100;
 
         // Set the value of the isFirstFrame uniform
         console.log(
-          "Set the value of the isFirstFrame=" + isFirstFrame + "  uniform"
+          "Set the value of the isFirstFrame=" + animationIsRunning + "  uniform"
         );
-        gl.uniform1i(isFirstFrameLocation, isFirstFrame);
+        gl.uniform1i(isFirstFrameLocation, !animationIsRunning);
 
         // Render to the framebuffer using the current texture as input
         //The code block prepares the framebuffer and the current texture for rendering.
@@ -113,13 +121,20 @@ const Canvas = (props) => {
       return () => {
         window.cancelAnimationFrame(animationFrameId);
       };
-    }, [draw]);
+    }, [draw, animationIsRunning]);
 
     return canvasRef;
   };
 
   const canvasRef = useCanvas(draw);
-  return <canvas ref={canvasRef} {...rest} />;
+  return (
+    <div>
+  <canvas ref={canvasRef} {...rest} />
+  <button onClick={toggleAnimation}>
+        {animationIsRunning ? "Stop Animation" : "Start Animation"}
+      </button>
+      </div>
+      );
 };
 
 export default Canvas;
