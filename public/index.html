@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!--<script src="https://greggman.github.io/webgl-lint/webgl-lint.js"></script>-->
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
+
+<head>
+  <!--<script src="https://greggman.github.io/webgl-lint/webgl-lint.js"></script>-->
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -25,22 +23,47 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <div class="App">
-      <Canvas
-        id="GLCanvas"
-        class="GLCanvas"
-        width=200px;
-        height=200px;></Canvas>
-    </div>
-    <button style="width: 100px; height: 50px;"onclick="toggleAnimation()">Toggle Animation</button>
+  <title>React App</title>
+</head>
 
-    <script>
-      const VertexShaderSource = `
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <div class="App">
+    <Canvas id="GLCanvas" class="GLCanvas" width=200px; height=200px;></Canvas>
+  </div>
+  <button onclick="toggleAnimation()">Toggle Animation</button>
+  <div class="sliders-container">
+    <div class="slider-box">
+        <label for="dASlider" class="slider-label">Diffusion Rate A:</label>
+        <input type="range" id="dASlider" class="slider" min="0" max="2" step="0.01" value="1.0">
+        <span id="dAValue" class="value">1.0</span>
+        <p class="slider-description">Diffusion rate of substance A.</p>
+    </div>
+    <div class="slider-box">
+        <label for="dBSlider" class="slider-label">Diffusion Rate B:</label>
+        <input type="range" id="dBSlider" class="slider" min="0" max="2" step="0.01" value="0.24">
+        <span id="dBValue" class="value">0.24</span>
+        <p class="slider-description">Diffusion rate of substance B.</p>
+    </div>
+    <div class="slider-box">
+        <label for="feedSlider" class="slider-label">Feed Rate:</label>
+        <input type="range" id="feedSlider" class="slider" min="0" max="1" step="0.001" value="0.055">
+        <span id="feedValue" class="value">0.055</span>
+        <p class="slider-description">Rate at which substance A is fed into the solution.</p>
+    </div>
+    <div class="slider-box">
+        <label for="killSlider" class="slider-label">Kill Rate:</label>
+        <input type="range" id="killSlider" class="slider" min="0" max="1" step="0.001" value="0.062">
+        <span id="killValue" class="value">0.062</span>
+        <p class="slider-description">Rate at which substance B is removed.</p>
+    </div>
+</div>
+
+
+
+  <script>
+    const VertexShaderSource = `
     attribute vec2 a_position;
     attribute vec2 a_texCoord;
     
@@ -67,8 +90,21 @@
 precision highp float;
 uniform highp sampler2D uPrevTexture;
 uniform bool animationIsRunning;
+uniform bool isFirstFrame;
 uniform highp float u_kernel[9];
 uniform float u_kernelWeight;
+
+uniform float dA;
+uniform float dB;
+uniform float feed;
+uniform float kill;
+
+
+uniform float mouseX;
+uniform float mouseY;
+uniform bool leftClick;
+uniform bool rightClick;
+uniform vec3 drawColor;
 
 // Passed in from the vertex shader.
 varying vec2 v_texCoord;
@@ -120,37 +156,15 @@ float rand(vec2 co){
 
 void main() {
 
-  float dA = 1.0; //Diffusion Rate A
-  float dB = 0.24; //Diffusion Rate B
-  float feed = 0.055; //Feed Rate at which A is feed into
-  float kill = 0.062; //Kill Rate at wich B is Removed
 
   float resolutionX = 200.0;
   float resolutionY = 200.0;
   
-  
-  if (!animationIsRunning) {
+  if(isFirstFrame) {
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  }
 
-    if(rand(v_texCoord + vec2(2.123, 3.321)) > 0.5) {
-      gl_FragColor = vec4(0.0,rand(v_texCoord),0.0,1.0);
-    } else {
-      gl_FragColor = vec4(rand(v_texCoord),0.0,0.0,1.0);
-    }
-        
-
-    // if(gl_FragCoord.x + 0.5 >= 70.0 && gl_FragCoord.x + 0.5 <= 130.0 && gl_FragCoord.y + 0.5 >= 70.0 && gl_FragCoord.y + 0.5 <= 130.0) {
-    //   gl_FragColor = vec4(0, 1.0, 0.0, 1.0);
-      
-    // } else {
-    //   gl_FragColor = vec4(1.0,0.0,0.0,1);
-    // }
-    
-
-    
-      
-    } else {
-
-      // Sample the prevTexture color
+  // Sample the prevTexture color
       vec2 textureCoord = v_texCoord;
 
       // Round down the coordinate to the nearest pixel
@@ -160,6 +174,14 @@ void main() {
       vec2 textureAsPixelCoord = fract(vec2((pixelCoord.x + 0.5), (pixelCoord.y + 0.5)) / vec2(resolutionX, resolutionY));
     
       vec4 prevTextureColor = texture2D(uPrevTexture, textureAsPixelCoord, 0.0);
+
+  if (!animationIsRunning) {
+
+    
+    
+      gl_FragColor = prevTextureColor;
+      
+    } else {
       
          if(mod(pixelCoord.x, 1.0) == 0.0) {
           gl_FragColor = prevTextureColor;
@@ -176,12 +198,15 @@ void main() {
              ((kill + feed) * prevTextureColor.g)) * 1.0 , 0, 1);
         }
     }
-    
 
-    
-    
-     
-  
+    float xDist = mouseX - pixelCoord.x;
+    float yDist = mouseY - pixelCoord.y;
+    if(leftClick || rightClick) {
+      if(sqrt( (xDist * xDist) + (yDist * yDist) ) < 20.0 ) {
+      gl_FragColor = vec4(drawColor, 1.0);
+    }
+    }
+   
 
 }
 
@@ -191,271 +216,369 @@ void main() {
 
 
 
-      const resulution = { x: 200, y: 200 };
-      const canvas = document.getElementById("GLCanvas");
-      const gl = canvas.getContext("webgl");
-      var frameCount = 0;
-      
-  
+    const resolution = { x: 200.0, y: 200.0 };
+    const canvas = document.getElementById("GLCanvas");
+    const gl = canvas.getContext("webgl");
+    var frameCount = 0;
 
-      var animationIsRunning = false;
-      const toggleAnimation = () => {
+
+    var dA = 1.0; //Diffusion Rate A
+    var dB = 0.24; //Diffusion Rate B
+    var feed = 0.055; //Feed Rate at which A is feed into the solution
+    var kill = 0.062; //Kill Rate at wich B is Removed
+
+    function updateValues() {
+      dA = parseFloat(document.getElementById("dASlider").value);
+      dB = parseFloat(document.getElementById("dBSlider").value);
+      feed = parseFloat(document.getElementById("feedSlider").value);
+      kill = parseFloat(document.getElementById("killSlider").value);
+
+      // Update the displayed values
+      document.getElementById("dAValue").textContent = dA.toFixed(2);
+      document.getElementById("dBValue").textContent = dB.toFixed(2);
+      document.getElementById("feedValue").textContent = feed.toFixed(3);
+      document.getElementById("killValue").textContent = kill.toFixed(3);
+
+      // You can use the updated dA, dB, feed, and kill variables as needed
+      console.log("Updated values:", dA, dB, feed, kill);
+    }
+
+    // Add event listeners to the sliders
+    document.getElementById("dASlider").addEventListener("input", updateValues);
+    document.getElementById("dBSlider").addEventListener("input", updateValues);
+    document.getElementById("feedSlider").addEventListener("input", updateValues);
+    document.getElementById("killSlider").addEventListener("input", updateValues);
+
+    // Add event listeners for mouse events
+    canvas.addEventListener("mousemove", handleMouseMove);
+      canvas.addEventListener("mousedown", handleMouseDown);
+      canvas.addEventListener("mouseup", handleMouseUp);
+
+    var animationIsRunning = false;
+    const toggleAnimation = () => {
       console.log("Button clicked!: " + !animationIsRunning); // Add this line
       animationIsRunning = !animationIsRunning;
-      };
+    };
 
-      
-      //SHADER INITIALIZATION
-      //===============================================================
-      function initShader() {
+    //BRUSH WITH MOUSE
+      // Variables to track mouse state and color
+      let mouseX = 0;
+      let mouseY = 0;
+      let leftClick = false;
+      let rightClick = false;
+
+      // Function to handle mouse move
+      function handleMouseMove(event) {
+        mouseX = event.offsetX;
+        mouseY = event.offsetY;
+      }
+
+      // Function to handle mouse down (left click and right click)
+      function handleMouseDown(event) {
+        if (event.button === 0) {
+          // Left click
+          console.log("Left clicked");
+          leftClick = true;
+          rightClick = false;
+        } else if (event.button === 2) {
+          // Right click
+          console.log("Right clicked");
+          rightClick = true;
+          leftClick = false;
+        }
+      }
+
+      // Function to handle mouse up
+      function handleMouseUp() {
+        leftClick = false;
+        rightClick = false;
+      }
+    
+
+    // create two textures for ping-pong rendering
+    const textureWidth = 200;
+    const textureHeight = 200;
+    const textures = [];
+    for (let i = 0; i < 2; i++) {
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        textureWidth,
+        textureHeight,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        null
+      );
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      textures.push(texture);
+    }
+
+    // Create and bind the framebuffer
+    const fb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    // Attach the textures to the framebuffer
+    for (let i = 0; i < 2; i++) {
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        textures[i],
+        0
+      );
+    }
+
+    //SHADER INITIALIZATION
+    //===============================================================
+    function initShader() {
       const buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([
-        0,
-        0,
-        resulution.x,
-        0,
-        0,
-        resulution.y,
-        0,
-        resulution.y,
-        resulution.x,
-        0,
-        resulution.x,
-        resulution.y,
-      ]),
-      gl.STATIC_DRAW
-    );
-
-    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, VertexShaderSource);
-    gl.compileShader(vertexShader);
-
-    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    console.log("Frag shader: " + FragShaderSource);
-    gl.shaderSource(fragmentShader, FragShaderSource);
-    gl.compileShader(fragmentShader);
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
-    gl.useProgram(program);
-
-    const positionLocation = gl.getAttribLocation(program, "a_position");
-    var resolutionUniformLocation = gl.getUniformLocation(
-      program,
-      "u_resolution"
-    );
-    gl.enableVertexAttribArray(positionLocation);
-    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    var size = 2; // 2 components per iteration
-    var type = gl.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    gl.vertexAttribPointer(
-      positionLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
-    );
-    gl.uniform2f(resolutionUniformLocation, resulution.x, resulution.y);
-
-
-    var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
-
-    // provide texture coordinates for the rectangle.
-    var texCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([
-        0,
-        0,
-        1,
-        0,
-        0,
-       1,
-        0,
-        1,
-        1,
-        0,
-        1,
-        1,
-      ]),
-      gl.STATIC_DRAW
-    );
-
-    // Turn on the attribute
-    gl.enableVertexAttribArray(texCoordAttributeLocation);
-    // Tell the attribute how to get data out of texCoordBuffer (ARRAY_BUFFER)
-    var size = 2; // 2 components per iteration
-    var type = gl.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    gl.vertexAttribPointer(
-      texCoordAttributeLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
-    );
-
-    
-
-
-
-
-    // Define several convolution kernels
-    var kernels = {
-      normal: [0, 0, 0, 0, 1, 0, 0, 0, 0],
-      diffusion:  [0.05, 0.2, 0.05, 0.2, -1.0, 0.2, 0.05, 0.2 , 0.05],
-      test:       [0.250, 0.5, 0.250, 0.5, -1.0, 0.5, 0.250, 0.5 , 0.250]
-    };
-    var initialSelection = "diffusion";
-    
-    //Bind the post processing kernels
-    var kernelLocation = gl.getUniformLocation(program, "u_kernel[0]");
-     // set the kernel and it's weight
-     gl.uniform1fv(kernelLocation, kernels[initialSelection])
-
-    // Bind the previous texture uniform location
-    const prevTextureLocation = gl.getUniformLocation(program, "uPrevTexture");
-    gl.uniform1i(prevTextureLocation, 0); // Set the texture unit to 0
-
-    // Get the uniform location for animationIsRunning
-    const animationIsRunningLocation = gl.getUniformLocation(program, "animationIsRunning");
-
-    // Set the value of the animationIsRunning uniform
-    console.log(
-      "Set the value of the animationIsRunning=" + animationIsRunning + "  uniform"
-    );
-    gl.uniform1i(animationIsRunningLocation, animationIsRunning);
-
-    console.log(gl.getExtension("WEBGL_draw_buffers"));
-    console.log("Finished Initialization of Canvas");
-  };
-
-  // create two textures for ping-pong rendering
-  const textureWidth = 200;
-      const textureHeight = 200;
-      const textures = [];
-      for (let i = 0; i < 2; i++) {
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(
-          gl.TEXTURE_2D,
+        gl.ARRAY_BUFFER,
+        new Float32Array([
           0,
-          gl.RGBA,
-          textureWidth,
-          textureHeight,
           0,
-          gl.RGBA,
-          gl.UNSIGNED_BYTE,
-          null
-        );
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        textures.push(texture);
-      }
+          resolution.x,
+          0,
+          0,
+          resolution.y,
+          0,
+          resolution.y,
+          resolution.x,
+          0,
+          resolution.x,
+          resolution.y,
+        ]),
+        gl.STATIC_DRAW
+      );
 
-      // Create and bind the framebuffer
-      const fb = gl.createFramebuffer();
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-      // Attach the textures to the framebuffer
-      for (let i = 0; i < 2; i++) {
-        gl.framebufferTexture2D(
-          gl.FRAMEBUFFER,
-          gl.COLOR_ATTACHMENT0,
-          gl.TEXTURE_2D,
-          textures[i],
-          0
-        );
-      }
+      const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vertexShader, VertexShaderSource);
+      gl.compileShader(vertexShader);
+
+      const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+      console.log("Frag shader: " + FragShaderSource);
+      gl.shaderSource(fragmentShader, FragShaderSource);
+      gl.compileShader(fragmentShader);
+
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      gl.useProgram(program);
+
+      const positionLocation = gl.getAttribLocation(program, "a_position");
+      var resolutionUniformLocation = gl.getUniformLocation(
+        program,
+        "u_resolution"
+      );
+      gl.enableVertexAttribArray(positionLocation);
+      // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+      var size = 2; // 2 components per iteration
+      var type = gl.FLOAT; // the data is 32bit floats
+      var normalize = false; // don't normalize the data
+      var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+      var offset = 0; // start at the beginning of the buffer
+      gl.vertexAttribPointer(
+        positionLocation,
+        size,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      gl.uniform2f(resolutionUniformLocation, resolution.x, resolution.y);
+
+
+      var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
+
+      // provide texture coordinates for the rectangle.
+      var texCoordBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          1,
+          1,
+          0,
+          1,
+          1,
+        ]),
+        gl.STATIC_DRAW
+      );
+
+      // Turn on the attribute
+      gl.enableVertexAttribArray(texCoordAttributeLocation);
+      // Tell the attribute how to get data out of texCoordBuffer (ARRAY_BUFFER)
+      var size = 2; // 2 components per iteration
+      var type = gl.FLOAT; // the data is 32bit floats
+      var normalize = false; // don't normalize the data
+      var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+      var offset = 0; // start at the beginning of the buffer
+      gl.vertexAttribPointer(
+        texCoordAttributeLocation,
+        size,
+        type,
+        normalize,
+        stride,
+        offset
+      );
 
 
 
-  //===============================================================
 
-  //DRAW FUNCTION
-  //===============================================================
-  const draw = (ctx, frameCount) => {
-      ctx.drawArrays(ctx.TRIANGLES, 0, 6);
+      // Define several convolution kernels
+      var kernels = {
+        normal: [0, 0, 0, 0, 1, 0, 0, 0, 0],
+        diffusion: [0.05, 0.2, 0.05, 0.2, -1.0, 0.2, 0.05, 0.2, 0.05],
+        test: [0.250, 0.5, 0.250, 0.5, -1.0, 0.5, 0.250, 0.5, 0.250]
       };
+      var initialSelection = "diffusion";
 
-  //RENDER STUFF:
-  function render(drawCallback) {
-        frameCount++;
+      //Bind the post processing kernels
+      var kernelLocation = gl.getUniformLocation(program, "u_kernel[0]");
+      // set the kernel and it's weight
+      gl.uniform1fv(kernelLocation, kernels[initialSelection])
 
-        // Get the uniform location for animationIsRunning
-        const animationIsRunningLocation = gl.getUniformLocation(
-          program,
-          "animationIsRunning"
-        );
+      // Bind the previous texture uniform location
+      const prevTextureLocation = gl.getUniformLocation(program, "uPrevTexture");
+      gl.uniform1i(prevTextureLocation, 0); // Set the texture unit to 0
 
-        // Set the value of the animationIsRunning uniform
-        console.log(
-          "Set the value of the animationIsRunning=" + animationIsRunning + "  uniform"
-        );
-        gl.uniform1i(animationIsRunningLocation, animationIsRunning);
+      // Get the uniform location for animationIsRunning
+      const animationIsRunningLocation = gl.getUniformLocation(program, "animationIsRunning");
 
-        // Render to the framebuffer using the current texture as input
-        //The code block prepares the framebuffer and the current texture for rendering.
-        //It ensures that subsequent rendering operations will be directed to
-        //the framebuffer using the current texture as the color buffer.
-        const currentTexture = textures[frameCount % 2]; //Important: we always render to currentTexture,
-        //but in the next frame it switches to the other array position, so the currentTexture automatically
-        //becomes the prev texture in the next frame.
-        const prevTexture = textures[(frameCount + 1) % 2];
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-        gl.framebufferTexture2D(
-          gl.FRAMEBUFFER,
-          gl.COLOR_ATTACHMENT0,
-          gl.TEXTURE_2D,
-          currentTexture,
-          0
-        );
+      // Set the value of the animationIsRunning uniform
+      console.log(
+        "Set the value of the animationIsRunning=" + animationIsRunning + "  uniform"
+      );
+      gl.uniform1i(animationIsRunningLocation, animationIsRunning);
 
-        // Render the scene with the previous frame's texture
-        gl.bindTexture(gl.TEXTURE_2D, prevTexture);
-        gl.viewport(0, 0, textureWidth, textureHeight);
-        gl.clearColor(0, 0, 1, 1); // clear to blue
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        drawCallback(gl, frameCount);
+      console.log(gl.getExtension("WEBGL_draw_buffers"));
+      console.log("Finished Initialization of Canvas");
+    };
 
-        // Render to the canvas using the current texture
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null); //this will make it render to canvas
-        gl.bindTexture(gl.TEXTURE_2D, prevTexture);
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(1, 1, 1, 1); // clear to white
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        drawCallback(gl, frameCount);
 
-        animationFrameId = window.requestAnimationFrame(() => render(drawCallback));
-        
+    //===============================================================
+
+    //DRAW FUNCTION
+    //===============================================================
+    const draw = (ctx, frameCount) => {
+      ctx.drawArrays(ctx.TRIANGLES, 0, 6);
+    };
+
+    //RENDER STUFF:
+    function render(drawCallback) {
+      frameCount++;
+
+      const firstFrameLocation = gl.getUniformLocation(program, "isFirstFrame");
+      gl.uniform1i(firstFrameLocation, frameCount === 1);
+
+      // Get the uniform location for animationIsRunning
+      const animationIsRunningLocation = gl.getUniformLocation(
+        program,
+        "animationIsRunning"
+      );
+
+      gl.uniform1i(animationIsRunningLocation, animationIsRunning);
+
+
+      // Get the uniform locations for the four variables
+      const dALocation = gl.getUniformLocation(program, "dA");
+      const dBLocation = gl.getUniformLocation(program, "dB");
+      const feedLocation = gl.getUniformLocation(program, "feed");
+      const killLocation = gl.getUniformLocation(program, "kill");
+
+      gl.uniform1f(dALocation, dA);
+      gl.uniform1f(dBLocation, dB);
+      gl.uniform1f(feedLocation, feed);
+      gl.uniform1f(killLocation, kill);
+
+      const mouseXLocation = gl.getUniformLocation(program, "mouseX");
+      const mouseYLocation = gl.getUniformLocation(program, "mouseY");
+      const leftClickLocation = gl.getUniformLocation(program, "leftClick");
+      const rightClickLocation = gl.getUniformLocation(program, "rightClick");
+      const drawColorLocation = gl.getUniformLocation(program, "drawColor");
+
+    
+
+
+        //Set mouse-related uniforms in the shader
+        console.log("setting mouseX" + (mouseX/10.0) * (resolution.x/100));
+        //console.log("setting mouseY" + (mouseY/10.0) * (100/resolution.y));
+    gl.uniform1f(mouseXLocation, (mouseX/10.0) * (resolution.x/100));
+    gl.uniform1f(mouseYLocation, resolution.y - ((mouseY/10.0) * (resolution.y/100)));
+    gl.uniform1i(leftClickLocation, leftClick);
+    gl.uniform1i(rightClickLocation, rightClick);
+    if(leftClick) {
+      gl.uniform3fv(drawColorLocation, [0.0, 1.0, 0.0]); // Red color for left click, [1.0, 1.0, 1.0] for white
+    }
+    if(rightClick) {
+      gl.uniform3fv(drawColorLocation, [1.0, 0.0, 0.0]); // Red color for left click, [1.0, 1.0, 1.0] for white
+    }
+   
+
+      // Render to the framebuffer using the current texture as input
+      //The code block prepares the framebuffer and the current texture for rendering.
+      //It ensures that subsequent rendering operations will be directed to
+      //the framebuffer using the current texture as the color buffer.
+      const currentTexture = textures[frameCount % 2]; //Important: we always render to currentTexture,
+      //but in the next frame it switches to the other array position, so the currentTexture automatically
+      //becomes the prev texture in the next frame.
+      const prevTexture = textures[(frameCount + 1) % 2];
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        currentTexture,
+        0
+      );
+
+      // Render the scene with the previous frame's texture
+      gl.bindTexture(gl.TEXTURE_2D, prevTexture);
+      gl.viewport(0, 0, textureWidth, textureHeight);
+      gl.clearColor(0, 0, 1, 1); // clear to blue
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      drawCallback(gl, frameCount);
+
+      // Render to the canvas using the current texture
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null); //this will make it render to canvas
+      gl.bindTexture(gl.TEXTURE_2D, prevTexture);
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+      gl.clearColor(1, 1, 1, 1); // clear to white
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      drawCallback(gl, frameCount);
+
+      animationFrameId = window.requestAnimationFrame(() => render(drawCallback));
+
 
       return () => {
         window.cancelAnimationFrame(animationFrameId);
       };
-      };
-    
-      //DRAW
+    };
 
-      const program = gl.createProgram();
-      initShader(gl, program, frameCount + 1);
-      render(draw);
+    //DRAW
 
-      
- 
+    const program = gl.createProgram();
+    initShader(gl, program, frameCount + 1);
+    render(draw);
 
-    </script>
-  </body>
+
+
+
+  </script>
+</body>
+
 </html>

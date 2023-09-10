@@ -1,3 +1,55 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
 .App {
   text-align: center;
+}
+
+#GLCanvas {
+  width: 1000px;
+  height: 1000px;
+  border: 1px solid black;
+}
+
+.sliders-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.slider-label {
+  text-align: center;
+}
+
+.slider-box {
+  border: 1px solid black;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.slider {
+  width: 320px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  -webkit-appearance: none;
+  background: #f1f1f1;
+}
+
+.value {
+  min-width: 30px;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+button {
+  margin-top: 20px;
 }
