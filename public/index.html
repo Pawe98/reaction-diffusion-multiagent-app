@@ -134,7 +134,7 @@ float laplace(in vec2 coordinate, in int channel) {
   vec2 textureAsPixelCoord7 = fract(vec2((coordinate.x + 0.5) + 0.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY)); //middle bottom
   vec2 textureAsPixelCoord8 = fract(vec2((coordinate.x + 0.5) + 1.0, (coordinate.y + 0.5) + 1.0) / vec2(resolutionX, resolutionY)); //right bottom
 
-  
+
   vec4 colorSum = texture2D(uPrevTexture, textureAsPixelCoord0, 0.0) * vec4(u_kernel[0], u_kernel[0], u_kernel[0], 1.0) +
   texture2D(uPrevTexture, textureAsPixelCoord1, 0.0) * vec4(u_kernel[1], u_kernel[1], u_kernel[1], 1.0) +
   texture2D(uPrevTexture, textureAsPixelCoord2, 0.0) * vec4(u_kernel[2], u_kernel[2], u_kernel[2], 1.0) +
@@ -190,7 +190,7 @@ void main() {
     } else {
       
          if(mod(pixelCoord.x, 1.0) == 0.0) {
-          gl_FragColor = prevTextureColor;
+        
 
             gl_FragColor = vec4(prevTextureColor.r + 
              ((dA * laplace(pixelCoord, 0)) - 
