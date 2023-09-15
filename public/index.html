@@ -530,10 +530,10 @@ void main() {
     gl.uniform1f(mouseYLocation, resolution.y - ((mouseY/10.0) * (resolution.y/100)));
     gl.uniform1i(leftClickLocation, leftClick);
     gl.uniform1i(rightClickLocation, rightClick);
-    if(leftClick) {
+    if(rightClick) {
       gl.uniform3fv(drawColorLocation, [0.0, 1.0, 0.0]); // Red color for left click, [1.0, 1.0, 1.0] for white
     }
-    if(rightClick) {
+    if(leftClick) {
       gl.uniform3fv(drawColorLocation, [1.0, 0.0, 0.0]); // Red color for left click, [1.0, 1.0, 1.0] for white
     }
    
