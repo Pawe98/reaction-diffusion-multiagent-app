@@ -53,3 +53,7 @@ body {
 button {
   margin-top: 20px;
 }
+
+.explanation {
+  display: flex;
+}

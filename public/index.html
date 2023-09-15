@@ -59,6 +59,10 @@
         <p class="slider-description">Rate at which substance B is removed.</p>
     </div>
 </div>
+<div class="explanation">
+  <img src="https://www.karlsims.com/rd-equation.png" alt="gray-scott reaction-diffusion equations">
+</div>
+
 
 
 
@@ -264,6 +268,13 @@ void main() {
     const toggleAnimation = () => {
       console.log("Button clicked!: " + !animationIsRunning); // Add this line
       animationIsRunning = !animationIsRunning;
+      loopEveryTenPixel();
+    };
+
+    const loopEveryTenPixel = () => {
+      var startFrameCount = 0;
+      while
+
     };
 
     //BRUSH WITH MOUSE
